@@ -1,0 +1,44 @@
+# Event Processor - Prod 环境
+
+aws:
+  profile: prod-us
+  region: us-west-2
+  account_id: "879794963971"
+
+app:
+  name: event-processor-prod
+  description: Event deduplication pipeline
+
+flink:
+  runtime: FLINK-1_20
+  parallelism: 4
+  parallelism_per_kpu: 1
+  autoscaling_enabled: true
+  min_parallelism: 2
+  max_parallelism: 16
+
+iam:
+  # TODO: 更新为 prod 环境的 role
+  execution_role_arn: arn:aws:iam::879794963971:role/lexi2-prod-usw2-879794963971-flink-execution-role
+
+vpc:
+  # TODO: 更新为 prod 环境的 VPC
+  vpc_id: vpc-xxx
+  subnet_ids:
+    - subnet-xxx
+    - subnet-xxx
+  security_group_id: sg-xxx
+
+msk:
+  bootstrap_servers: boot-xxx.kafka-serverless.us-west-2.amazonaws.com:9098
+
+s3:
+  code_bucket: lexi2-prod-usw2-879794963971-flink-code
+
+kafka:
+  input_topic: raw-events
+  output_topic: processed-events
+
+logging:
+  log_level: WARN
+  log_group: /aws/kinesis-analytics/event-processor-prod

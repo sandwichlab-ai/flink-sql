@@ -1,0 +1,41 @@
+# Event Processor - Dev 环境
+
+aws:
+  profile: dev-us
+  region: us-west-2
+  account_id: "856969325542"
+
+app:
+  name: event-processor-dev
+  description: Event deduplication pipeline
+
+flink:
+  runtime: FLINK-1_20
+  parallelism: 1
+  parallelism_per_kpu: 1
+  autoscaling_enabled: false
+  min_parallelism: 1
+  max_parallelism: 4
+
+iam:
+  execution_role_arn: arn:aws:iam::856969325542:role/lexi2-dev-usw2-856969325542-flink-execution-role
+
+vpc:
+  vpc_id: vpc-0f456807dee4060a5
+  subnet_ids:
+    - subnet-01c18c77cca5dde43
+    - subnet-0ce1f0d7755a1d2df
+  security_group_id: sg-0cbf7b01b8bc9b3b3
+
+msk:
+  bootstrap_servers: boot-7zbc9cuu.c1.kafka-serverless.us-west-2.amazonaws.com:9098
+
+s3:
+  code_bucket: lexi2-dev-usw2-856969325542-flink-code
+
+kafka:
+  input_topic: raw-events
+  output_topic: processed-events
+
+logging:
+  log_group: /aws/kinesis-analytics/event-processor-dev

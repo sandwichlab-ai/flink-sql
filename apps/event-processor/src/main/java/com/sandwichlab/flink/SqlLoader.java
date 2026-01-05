@@ -39,11 +39,12 @@ public class SqlLoader {
         LOG.info("Loading SQL from: {}", resourcePath);
 
         String rawSql = readResource(resourcePath);
-        String sql = replaceVariables(rawSql);
-        String cleanedSql = removeComments(sql);
+        // 先移除注释，再替换变量（避免注释中的变量被解析）
+        String noComments = removeComments(rawSql);
+        String sql = replaceVariables(noComments);
 
-        LOG.debug("Loaded SQL:\n{}", cleanedSql);
-        return cleanedSql;
+        LOG.debug("Loaded SQL:\n{}", sql);
+        return sql;
     }
 
     private String readResource(String resourcePath) {

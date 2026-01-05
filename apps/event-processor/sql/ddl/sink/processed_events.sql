@@ -48,23 +48,3 @@ CREATE TABLE processed_events (
     'value.format' = 'json'
 );
 
--- ============================================================
--- Sink Table: events_archive
--- 归档事件到 S3 (可选)
--- ============================================================
-
--- CREATE TABLE events_archive (
---     event_id STRING,
---     user_id STRING,
---     event_type STRING,
---     event_time TIMESTAMP(3),
---     dt STRING,  -- 分区字段
---     hr STRING   -- 分区字段
--- ) PARTITIONED BY (dt, hr) WITH (
---     'connector' = 'filesystem',
---     'path' = 's3://${CODE_BUCKET}/events-archive/',
---     'format' = 'parquet',
---     'sink.partition-commit.policy.kind' = 'success-file',
---     'sink.rolling-policy.file-size' = '128MB',
---     'sink.rolling-policy.rollover-interval' = '15 min'
--- );
