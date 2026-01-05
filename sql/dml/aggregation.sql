@@ -1,0 +1,46 @@
+-- ============================================================
+-- DML: 事件聚合
+-- 按时间窗口聚合事件统计
+-- ============================================================
+
+-- 需要先创建聚合结果表
+-- CREATE TABLE event_stats (
+--     window_start TIMESTAMP(3),
+--     window_end TIMESTAMP(3),
+--     event_type STRING,
+--     platform STRING,
+--     event_count BIGINT,
+--     user_count BIGINT,
+--     PRIMARY KEY (window_start, event_type, platform) NOT ENFORCED
+-- ) WITH (...);
+
+-- 1分钟滚动窗口聚合
+-- INSERT INTO event_stats
+-- SELECT
+--     TUMBLE_START(event_time, INTERVAL '1' MINUTE) AS window_start,
+--     TUMBLE_END(event_time, INTERVAL '1' MINUTE) AS window_end,
+--     event_type,
+--     platform,
+--     COUNT(*) AS event_count,
+--     COUNT(DISTINCT user_id) AS user_count
+-- FROM raw_events
+-- GROUP BY
+--     TUMBLE(event_time, INTERVAL '1' MINUTE),
+--     event_type,
+--     platform;
+
+
+-- 滑动窗口聚合 (5分钟窗口，1分钟滑动)
+-- INSERT INTO event_stats
+-- SELECT
+--     HOP_START(event_time, INTERVAL '1' MINUTE, INTERVAL '5' MINUTE) AS window_start,
+--     HOP_END(event_time, INTERVAL '1' MINUTE, INTERVAL '5' MINUTE) AS window_end,
+--     event_type,
+--     platform,
+--     COUNT(*) AS event_count,
+--     COUNT(DISTINCT user_id) AS user_count
+-- FROM raw_events
+-- GROUP BY
+--     HOP(event_time, INTERVAL '1' MINUTE, INTERVAL '5' MINUTE),
+--     event_type,
+--     platform;
