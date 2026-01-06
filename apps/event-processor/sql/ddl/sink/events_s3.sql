@@ -1,9 +1,9 @@
 -- ============================================================
--- Sink Table: events_s3 (Hudi)
+-- Sink Table: events_s3 (Iceberg)
 -- 归档事件到 S3 Landing Zone，支持 Upsert 去重
 -- ============================================================
 
-CREATE TABLE events_s3 (
+CREATE TABLE IF NOT EXISTS iceberg_catalog.raw_events.events_s3 (
     -- 事件标识
     event_id STRING,
 
@@ -34,28 +34,9 @@ CREATE TABLE events_s3 (
     dt STRING,
     hr STRING,
 
-    -- 主键 (用于 Upsert 去重)
-    PRIMARY KEY (event_id) NOT ENFORCED
+    -- 主键 (用于 Upsert 去重, 必须包含分区字段)
+    PRIMARY KEY (event_id, dt, hr) NOT ENFORCED
 ) PARTITIONED BY (dt, hr) WITH (
-    'connector' = 'hudi',
-    'path' = 's3://dataware-landing-zone-dev/raw_signal/',
-
-    -- Hudi 表类型: MERGE_ON_READ (写入快，后台合并)
-    'table.type' = 'MERGE_ON_READ',
-
-    -- 写入操作: upsert (按 event_id 去重)
-    'write.operation' = 'upsert',
-
-    -- 记录键和分区路径
-    'hoodie.datasource.write.recordkey.field' = 'event_id',
-    'hoodie.datasource.write.partitionpath.field' = 'dt,hr',
-
-    -- AWS Managed Flink 必须禁用 timeline server
-    'hoodie.embed.timeline.server' = 'false',
-
-    -- Compaction 配置
-    'compaction.async.enabled' = 'true',
-    'compaction.schedule.enabled' = 'true',
-    'compaction.trigger.strategy' = 'num_commits',
-    'compaction.delta_commits' = '5'
-);
+    'format-version' = '2',
+    'write.upsert.enabled' = 'true'
+)

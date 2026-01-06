@@ -1,7 +1,7 @@
 -- ============================================================
 -- DML: 事件去重
 -- Kafka: 去重后的数据 (upsert)
--- S3: 原始数据 (append-only)
+-- S3 Iceberg: 原始数据 (upsert 去重)
 -- ============================================================
 
 -- 使用 STATEMENT SET 同时写入多个 Sink
@@ -34,8 +34,8 @@ FROM (
 )
 WHERE row_num = 1;
 
--- Sink 2: 写入 S3 (原始数据，append-only)
-INSERT INTO events_s3
+-- Sink 2: 写入 S3 Iceberg (原始数据，upsert 去重)
+INSERT INTO iceberg_catalog.raw_events.events_s3
 SELECT
     event_id,
     user_id,

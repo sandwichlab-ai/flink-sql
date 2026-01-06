@@ -70,6 +70,8 @@ def send_events(bootstrap_servers: str, topic: str, region: str, count: int, int
         client_id=socket.gethostname(),
         value_serializer=lambda v: json.dumps(v).encode("utf-8"),
         key_serializer=lambda k: k.encode("utf-8") if k else None,
+        api_version=(2, 8, 0),  # Skip auto-detection for MSK Serverless
+        request_timeout_ms=30000,
     )
 
     try:

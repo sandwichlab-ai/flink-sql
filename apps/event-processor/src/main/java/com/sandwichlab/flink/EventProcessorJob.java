@@ -59,8 +59,16 @@ public class EventProcessorJob {
         LOG.info("Creating sink table: processed_events (Kafka)");
         tableEnv.executeSql(sqlLoader.load("sql/ddl/sink/processed_events.sql"));
 
-        // DDL: 创建 S3 Sink 表
-        LOG.info("Creating sink table: events_s3 (S3)");
+        // DDL: 创建 Iceberg Catalog
+        LOG.info("Creating Iceberg catalog");
+        tableEnv.executeSql(sqlLoader.load("sql/ddl/catalog/iceberg_catalog.sql"));
+
+        // DDL: 创建 Iceberg Database
+        LOG.info("Creating Iceberg database");
+        tableEnv.executeSql(sqlLoader.load("sql/ddl/catalog/iceberg_database.sql"));
+
+        // DDL: 创建 S3 Sink 表 (Iceberg)
+        LOG.info("Creating sink table: events_s3 (Iceberg)");
         tableEnv.executeSql(sqlLoader.load("sql/ddl/sink/events_s3.sql"));
 
         // DML: 执行去重逻辑，同时写入 Kafka 和 S3

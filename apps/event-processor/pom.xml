@@ -23,6 +23,20 @@
             <artifactId>flink-streaming-java</artifactId>
         </dependency>
 
+        <!-- Flink Runtime - compile scope for HadoopUtils relocation -->
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-runtime</artifactId>
+            <version>1.20.0</version>
+            <scope>compile</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
         <dependency>
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-table-api-java-bridge</artifactId>
@@ -48,9 +62,11 @@
             <artifactId>flink-json</artifactId>
         </dependency>
 
+        <!-- S3 Filesystem - compile scope for Iceberg -->
         <dependency>
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-s3-fs-hadoop</artifactId>
+            <scope>compile</scope>
         </dependency>
 
         <dependency>
@@ -65,11 +81,74 @@
             <version>1.2.0</version>
         </dependency>
 
-        <!-- Apache Hudi for S3 upsert support -->
+        <!-- Apache Iceberg for S3 upsert support -->
+        <!-- 1.7.1 is the first stable release supporting Flink 1.20 -->
         <dependency>
-            <groupId>org.apache.hudi</groupId>
-            <artifactId>hudi-flink1.20-bundle</artifactId>
-            <version>1.0.1</version>
+            <groupId>org.apache.iceberg</groupId>
+            <artifactId>iceberg-flink-runtime-1.20</artifactId>
+            <version>1.7.1</version>
+        </dependency>
+
+        <!-- Iceberg AWS Bundle for Glue Catalog + S3FileIO -->
+        <!-- Note: Do NOT relocate AWS SDK, causes lambda serialization issues -->
+        <dependency>
+            <groupId>org.apache.iceberg</groupId>
+            <artifactId>iceberg-aws-bundle</artifactId>
+            <version>1.7.1</version>
+        </dependency>
+
+        <!-- Hadoop for Iceberg (required by FlinkCatalogFactory) -->
+        <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-common</artifactId>
+            <version>3.3.6</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>log4j</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-hdfs-client</artifactId>
+            <version>3.3.6</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>log4j</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <!-- Hadoop AWS for S3 FileSystem -->
+        <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-aws</artifactId>
+            <version>3.3.6</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>log4j</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.amazonaws</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
 
@@ -114,6 +193,18 @@
                                 </transformer>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
                             </transformers>
+                            <!-- Relocations for AWS Managed Flink classloader compatibility -->
+                            <!-- 参考: https://github.com/aws-samples/amazon-managed-service-for-apache-flink-examples -->
+                            <relocations>
+                                <relocation>
+                                    <pattern>org.apache.hadoop.conf</pattern>
+                                    <shadedPattern>shaded.org.apache.hadoop.conf</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>org.apache.flink.runtime.util.HadoopUtils</pattern>
+                                    <shadedPattern>shaded.org.apache.flink.runtime.util.HadoopUtils</shadedPattern>
+                                </relocation>
+                                </relocations>
                         </configuration>
                     </execution>
                 </executions>
