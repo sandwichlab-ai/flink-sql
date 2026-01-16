@@ -12,12 +12,6 @@ CREATE TABLE processed_events (
     user_id STRING,
     anonymous_id STRING,
     
-    -- ========== 营销归因（顶层字段） ==========
-    utm_source STRING,
-    utm_campaign STRING,
-    gclid STRING,
-    fbclid STRING,
-    
     -- ========== 嵌套数据 ==========
     utm_params MAP<STRING, STRING>,
     clid_params MAP<STRING, STRING>,
@@ -25,11 +19,12 @@ CREATE TABLE processed_events (
     user_data MAP<STRING, STRING>,
     event_properties MAP<STRING, STRING>,
     tracking_cookies MAP<STRING, STRING>,
+    retrieval_source MAP<STRING, STRING>,
     
-    -- ========== 时间戳（STRING 存储 ISO-8601）==========
-    event_time STRING,
-    sent_at STRING,
-    server_time STRING,
+    -- ========== 时间戳（BIGINT 存储 Unix 秒级时间戳）==========
+    event_time BIGINT,
+    report_time BIGINT,
+    server_time BIGINT,
     processed_time TIMESTAMP(3),
     
     -- ========== 处理元数据 ==========

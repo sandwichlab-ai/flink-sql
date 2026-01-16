@@ -12,12 +12,6 @@ CREATE TABLE raw_events (
     user_id STRING,                     -- 登录用户ID
     anonymous_id STRING,                -- 匿名用户ID（未登录用户）
     
-    -- ========== 营销归因 (顶层字段，便于查询) ==========
-    utm_source STRING,                  -- 流量来源（google, facebook, email 等）
-    utm_campaign STRING,                -- 营销活动名称
-    gclid STRING,                       -- Google Ads Click ID
-    fbclid STRING,                      -- Facebook Click ID
-    
     -- ========== 嵌套数据 (MAP 类型) ==========
     utm_params MAP<STRING, STRING>,     -- 完整 UTM 参数（utm_medium, utm_content, utm_term 等）
     clid_params MAP<STRING, STRING>,    -- 完整 CLID 参数（tracking_id, ttclid 等）
@@ -25,11 +19,12 @@ CREATE TABLE raw_events (
     user_data MAP<STRING, STRING>,      -- 用户数据（email, phone 等）
     event_properties MAP<STRING, STRING>, -- 事件属性（order_id, value, currency 等）
     tracking_cookies MAP<STRING, STRING>, -- 广告追踪 Cookies（_fbp, _fbc, _ga, _gid, _gcl_aw 等）
+    retrieval_source MAP<STRING, STRING>, -- SDK 数据源信息（sdk_key, sdk_version 等）
     
-    -- ========== 时间字段（STRING 存储 ISO-8601）==========
-    event_time STRING,                  -- 事件发生时间（ISO-8601: 2025-01-16T07:25:45.678Z）
-    sent_at STRING,                     -- 事件发送时间（ISO-8601）
-    server_time STRING,                 -- 服务器接收时间（ISO-8601）
+    -- ========== 时间字段（BIGINT 存储 Unix 秒级时间戳）==========
+    event_time BIGINT,                  -- 事件发生时间（Unix 秒级时间戳）
+    report_time BIGINT,                 -- 事件上报时间（Unix 秒级时间戳）
+    server_time BIGINT,                 -- 服务器接收时间（Unix 秒级时间戳）
     
     -- ========== Kafka 元数据 ==========
     `partition` INT METADATA FROM 'partition' VIRTUAL,

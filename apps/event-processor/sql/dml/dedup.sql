@@ -15,18 +15,15 @@ SELECT
     event_type,
     user_id,
     anonymous_id,
-    utm_source,
-    utm_campaign,
-    gclid,
-    fbclid,
     utm_params,
     clid_params,
     page_context,
     user_data,
     event_properties,
     tracking_cookies,
+    retrieval_source,
     event_time,
-    sent_at,
+    report_time,
     server_time,
     CURRENT_TIMESTAMP AS processed_time,
     'deduplicated' AS processing_status
@@ -42,24 +39,21 @@ FROM (
 WHERE row_num = 1;
 
 -- Sink 2: 写入 S3 Iceberg (原始数据，upsert 去重)
-INSERT INTO iceberg_catalog.raw_events.events_s3_v4
+INSERT INTO iceberg_catalog.raw_events.events_s3_v5
 SELECT
     event_id,
     event_type,
     user_id,
     anonymous_id,
-    utm_source,
-    utm_campaign,
-    gclid,
-    fbclid,
     utm_params,
     clid_params,
     page_context,
     user_data,
     event_properties,
     tracking_cookies,
+    retrieval_source,
     event_time,
-    sent_at,
+    report_time,
     server_time,
     CURRENT_TIMESTAMP AS processed_time,
     'raw' AS processing_status,

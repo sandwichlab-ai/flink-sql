@@ -51,8 +51,8 @@
 --     e.user_id,
 --     e.event_type AS conversion_type,
 --     e.event_time AS conversion_time,
---     e.properties['utm_source'] AS attributed_channel,
---     e.properties['utm_campaign'] AS attributed_campaign,
+--     e.utm_params['utm_source'] AS attributed_channel,
+--     e.utm_params['utm_campaign'] AS attributed_campaign,
 --     'last_touch' AS attribution_model
 -- FROM raw_events e
 -- WHERE e.event_type = 'conversion';
