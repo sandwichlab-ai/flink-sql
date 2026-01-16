@@ -42,7 +42,7 @@ FROM (
 WHERE row_num = 1;
 
 -- Sink 2: 写入 S3 Iceberg (原始数据，upsert 去重)
-INSERT INTO iceberg_catalog.raw_events.events_s3
+INSERT INTO iceberg_catalog.raw_events.events_s3_v4
 SELECT
     event_id,
     event_type,

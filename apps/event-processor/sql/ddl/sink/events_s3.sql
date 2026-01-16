@@ -3,7 +3,7 @@
 -- 归档事件到 S3 Landing Zone，支持 Upsert 去重
 -- ============================================================
 
-CREATE TABLE IF NOT EXISTS iceberg_catalog.raw_events.events_s3 (
+CREATE TABLE IF NOT EXISTS iceberg_catalog.raw_events.events_s3_v4 (
     -- ========== 事件标识 ==========
     event_id STRING,
     event_type STRING,
@@ -26,11 +26,11 @@ CREATE TABLE IF NOT EXISTS iceberg_catalog.raw_events.events_s3 (
     event_properties MAP<STRING, STRING>,
     tracking_cookies MAP<STRING, STRING>,
     
-    -- ========== 时间字段 ==========
-    event_time TIMESTAMP(3),
-    sent_at TIMESTAMP(3),
-    server_time TIMESTAMP(3),
-    processed_time TIMESTAMP(3),
+    -- ========== 时间字段（STRING 存储 ISO-8601）==========
+    event_time STRING,                  -- 事件发生时间（ISO-8601）
+    sent_at STRING,                     -- 事件发送时间（ISO-8601）
+    server_time STRING,                 -- 服务器接收时间（ISO-8601）
+    processed_time TIMESTAMP(3),        -- Flink 处理时间
     
     -- ========== 处理元数据 ==========
     processing_status STRING,

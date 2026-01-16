@@ -26,10 +26,10 @@ CREATE TABLE processed_events (
     event_properties MAP<STRING, STRING>,
     tracking_cookies MAP<STRING, STRING>,
     
-    -- ========== 时间戳 ==========
-    event_time TIMESTAMP(3),
-    sent_at TIMESTAMP(3),
-    server_time TIMESTAMP(3),
+    -- ========== 时间戳（STRING 存储 ISO-8601）==========
+    event_time STRING,
+    sent_at STRING,
+    server_time STRING,
     processed_time TIMESTAMP(3),
     
     -- ========== 处理元数据 ==========

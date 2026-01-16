@@ -26,17 +26,14 @@ CREATE TABLE raw_events (
     event_properties MAP<STRING, STRING>, -- 事件属性（order_id, value, currency 等）
     tracking_cookies MAP<STRING, STRING>, -- 广告追踪 Cookies（_fbp, _fbc, _ga, _gid, _gcl_aw 等）
     
-    -- ========== 时间字段 ==========
-    event_time TIMESTAMP(3),            -- 事件发生时间（客户端时间戳转换）
-    sent_at TIMESTAMP(3),               -- 事件发送时间（客户端）
-    server_time TIMESTAMP(3),           -- 服务器接收时间
+    -- ========== 时间字段（STRING 存储 ISO-8601）==========
+    event_time STRING,                  -- 事件发生时间（ISO-8601: 2025-01-16T07:25:45.678Z）
+    sent_at STRING,                     -- 事件发送时间（ISO-8601）
+    server_time STRING,                 -- 服务器接收时间（ISO-8601）
     
     -- ========== Kafka 元数据 ==========
     `partition` INT METADATA FROM 'partition' VIRTUAL,
-    `offset` BIGINT METADATA FROM 'offset' VIRTUAL,
-    
-    -- ========== Watermark (允许 5 秒乱序) ==========
-    WATERMARK FOR event_time AS event_time - INTERVAL '5' SECOND
+    `offset` BIGINT METADATA FROM 'offset' VIRTUAL
 ) WITH (
     'connector' = 'kafka',
     'topic' = '${INPUT_TOPIC}',
@@ -53,5 +50,7 @@ CREATE TABLE raw_events (
     'scan.startup.mode' = 'latest-offset',
     'format' = 'json',
     'json.fail-on-missing-field' = 'false',
-    'json.ignore-parse-errors' = 'true'
+    'json.ignore-parse-errors' = 'true',
+    'json.map-null-key.mode' = 'LITERAL',
+    'json.map-null-key.literal' = 'null'
 );
