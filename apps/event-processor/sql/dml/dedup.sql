@@ -29,7 +29,20 @@ SELECT
     'deduplicated' AS processing_status
 FROM (
     SELECT
-        *,
+        event_id,
+        event_type,
+        user_id,
+        anonymous_id,
+        utm_params,
+        clid_params,
+        page_context,
+        user_data,
+        event_properties,
+        tracking_cookies,
+        retrieval_source,
+        event_time,
+        report_time,
+        server_time,
         ROW_NUMBER() OVER (
             PARTITION BY event_id
             ORDER BY event_time DESC
