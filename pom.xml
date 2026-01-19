@@ -13,6 +13,7 @@
     <description>Flink SQL Applications Monorepo</description>
 
     <modules>
+        <module>libs/flink-udf</module>
         <module>apps/event-processor</module>
     </modules>
 

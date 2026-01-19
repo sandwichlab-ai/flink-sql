@@ -18,6 +18,13 @@
     <description>Event deduplication pipeline from MSK Kafka</description>
 
     <dependencies>
+        <!-- Flink UDF Library -->
+        <dependency>
+            <groupId>com.sandwichlab.flink</groupId>
+            <artifactId>flink-udf</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
         <dependency>
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-streaming-java</artifactId>

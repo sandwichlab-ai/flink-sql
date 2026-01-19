@@ -1,5 +1,6 @@
 package com.sandwichlab.flink;
 
+import com.sandwichlab.flink.udf.DdbWriteUdf;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.table.api.EnvironmentSettings;
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
@@ -51,6 +52,10 @@ public class EventProcessorJob {
     }
 
     private static void executeJob(StreamTableEnvironment tableEnv, SqlLoader sqlLoader) {
+        // 注册 UDF
+        LOG.info("Registering UDF: ddb_write");
+        tableEnv.createTemporarySystemFunction("ddb_write", DdbWriteUdf.class);
+
         // DDL: 创建源表
         LOG.info("Creating source table: raw_events");
         tableEnv.executeSql(sqlLoader.load("sql/ddl/source/raw_events.sql"));
@@ -75,8 +80,8 @@ public class EventProcessorJob {
         LOG.info("Creating sink table: click_events_ddb (DynamoDB)");
         tableEnv.executeSql(sqlLoader.load("sql/ddl/sink/click_events_ddb.sql"));
 
-        // DML: 执行去重逻辑，同时写入 Kafka、S3 和 DynamoDB
-        LOG.info("Executing deduplication (triple sink: Kafka + S3 + DDB)");
-        tableEnv.executeSql(sqlLoader.load("sql/dml/dedup.sql"));
+        // DML: 执行去重逻辑，使用 UDF 先写 DynamoDB，再写 Kafka 和 S3
+        LOG.info("Executing deduplication with UDF (DDB first, then Kafka + S3)");
+        tableEnv.executeSql(sqlLoader.load("sql/dml/dedup_with_udf.sql"));
     }
 }
