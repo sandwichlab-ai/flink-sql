@@ -71,8 +71,12 @@ public class EventProcessorJob {
         LOG.info("Creating sink table: events_s3 (Iceberg)");
         tableEnv.executeSql(sqlLoader.load("sql/ddl/sink/events_s3.sql"));
 
-        // DML: 执行去重逻辑，同时写入 Kafka 和 S3
-        LOG.info("Executing deduplication (dual sink: Kafka + S3)");
+        // DDL: 创建 DynamoDB Sink 表
+        LOG.info("Creating sink table: click_events_ddb (DynamoDB)");
+        tableEnv.executeSql(sqlLoader.load("sql/ddl/sink/click_events_ddb.sql"));
+
+        // DML: 执行去重逻辑，同时写入 Kafka、S3 和 DynamoDB
+        LOG.info("Executing deduplication (triple sink: Kafka + S3 + DDB)");
         tableEnv.executeSql(sqlLoader.load("sql/dml/dedup.sql"));
     }
 }

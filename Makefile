@@ -29,6 +29,7 @@ BOOTSTRAP_SERVERS := $(shell yq '.msk.bootstrap_servers' $(CONFIG_FILE))
 CODE_BUCKET := $(shell yq '.s3.code_bucket' $(CONFIG_FILE))
 INPUT_TOPIC := $(shell yq '.kafka.input_topic' $(CONFIG_FILE))
 OUTPUT_TOPIC := $(shell yq '.kafka.output_topic' $(CONFIG_FILE))
+DDB_TABLE_NAME := $(shell yq '.dynamodb.table_name' $(CONFIG_FILE))
 CLOUDWATCH_LOG_GROUP := $(shell yq '.logging.log_group' $(CONFIG_FILE))
 
 # ==================== 构建配置 ====================
@@ -87,6 +88,7 @@ config: ## 显示当前配置
 	@echo "  Code Bucket:   $(CODE_BUCKET)"
 	@echo "  Input Topic:   $(INPUT_TOPIC)"
 	@echo "  Output Topic:  $(OUTPUT_TOPIC)"
+	@echo "  DDB Table:     $(DDB_TABLE_NAME)"
 
 # ==================== 构建 ====================
 
@@ -156,7 +158,9 @@ create-app: build upload-jar create-log-group ## 创建 Flink 应用
 					\"PropertyMap\": { \
 						\"BOOTSTRAP_SERVERS\": \"$(BOOTSTRAP_SERVERS)\", \
 						\"INPUT_TOPIC\": \"$(INPUT_TOPIC)\", \
-						\"OUTPUT_TOPIC\": \"$(OUTPUT_TOPIC)\" \
+						\"OUTPUT_TOPIC\": \"$(OUTPUT_TOPIC)\", \
+						\"AWS_REGION\": \"$(AWS_REGION)\", \
+						\"DDB_TABLE_NAME\": \"$(DDB_TABLE_NAME)\" \
 					} \
 				}] \
 			}, \

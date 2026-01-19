@@ -37,5 +37,8 @@ kafka:
   input_topic: raw-events
   output_topic: processed-events
 
+dynamodb:
+  table_name: click_events_dev
+
 logging:
   log_group: /aws/kinesis-analytics/event-processor-dev

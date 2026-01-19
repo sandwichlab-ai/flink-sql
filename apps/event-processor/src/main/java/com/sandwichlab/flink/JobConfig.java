@@ -25,6 +25,8 @@ public class JobConfig {
     private final String bootstrapServers;
     private final String inputTopic;
     private final String outputTopic;
+    private final String awsRegion;
+    private final String ddbTableName;
 
     public JobConfig(String[] args) {
         Map<String, String> props = loadProperties();
@@ -32,6 +34,8 @@ public class JobConfig {
         this.bootstrapServers = props.getOrDefault("BOOTSTRAP_SERVERS", "localhost:9092");
         this.inputTopic = props.getOrDefault("INPUT_TOPIC", "raw-events");
         this.outputTopic = props.getOrDefault("OUTPUT_TOPIC", "processed-events");
+        this.awsRegion = props.getOrDefault("AWS_REGION", "us-west-2");
+        this.ddbTableName = props.getOrDefault("DDB_TABLE_NAME", "click_events");
     }
 
     private Map<String, String> loadProperties() {
@@ -56,6 +60,8 @@ public class JobConfig {
         props.put("BOOTSTRAP_SERVERS", getEnvOrProperty("BOOTSTRAP_SERVERS", "localhost:9092"));
         props.put("INPUT_TOPIC", getEnvOrProperty("INPUT_TOPIC", "raw-events"));
         props.put("OUTPUT_TOPIC", getEnvOrProperty("OUTPUT_TOPIC", "processed-events"));
+        props.put("AWS_REGION", getEnvOrProperty("AWS_REGION", "us-west-2"));
+        props.put("DDB_TABLE_NAME", getEnvOrProperty("DDB_TABLE_NAME", "click_events"));
 
         LOG.info("Loaded properties from env/system: {}", props);
         return props;
@@ -90,14 +96,17 @@ public class JobConfig {
         variables.put("BOOTSTRAP_SERVERS", bootstrapServers);
         variables.put("INPUT_TOPIC", inputTopic);
         variables.put("OUTPUT_TOPIC", outputTopic);
+        variables.put("AWS_REGION", awsRegion);
+        variables.put("DDB_TABLE_NAME", ddbTableName);
+
         return variables;
     }
 
     @Override
     public String toString() {
         return String.format(
-            "JobConfig{bootstrapServers='%s', inputTopic='%s', outputTopic='%s'}",
-            bootstrapServers, inputTopic, outputTopic
+            "JobConfig{bootstrapServers='%s', inputTopic='%s', outputTopic='%s', awsRegion='%s', ddbTableName='%s'}",
+            bootstrapServers, inputTopic, outputTopic, awsRegion, ddbTableName
         );
     }
 }

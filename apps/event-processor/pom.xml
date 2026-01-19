@@ -62,6 +62,12 @@
             <artifactId>flink-json</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-connector-dynamodb</artifactId>
+            <version>5.1.0-1.20</version>
+        </dependency>
+
         <!-- S3 Filesystem - compile scope for Iceberg -->
         <dependency>
             <groupId>org.apache.flink</groupId>
