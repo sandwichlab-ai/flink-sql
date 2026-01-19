@@ -26,7 +26,10 @@ CREATE TABLE processed_events (
     report_time BIGINT,
     server_time BIGINT,
     processed_time TIMESTAMP(3),
-    
+
+    -- ========== GTM 调试参数 ==========
+    gtm_preview_code STRING,            -- GTM Server Preview 调试参数
+
     -- ========== 处理元数据 ==========
     processing_status STRING,    -- success, filtered, deduplicated
     

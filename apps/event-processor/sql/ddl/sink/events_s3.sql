@@ -26,7 +26,10 @@ CREATE TABLE IF NOT EXISTS iceberg_catalog.raw_events.events_s3_v5 (
     report_time BIGINT,                 -- 事件上报时间（Unix 秒级时间戳）
     server_time BIGINT,                 -- 服务器接收时间（Unix 秒级时间戳）
     processed_time TIMESTAMP(3),        -- Flink 处理时间
-    
+
+    -- ========== GTM 调试参数 ==========
+    gtm_preview_code STRING,            -- GTM Server Preview 调试参数
+
     -- ========== 处理元数据 ==========
     processing_status STRING,
     

@@ -9,7 +9,26 @@ EXECUTE STATEMENT SET
 BEGIN
 
 -- Sink 1: 写入 Kafka (去重后)
-INSERT INTO processed_events
+-- 注意：显式指定列名以确保列顺序正确
+INSERT INTO processed_events (
+    event_id,
+    event_type,
+    user_id,
+    anonymous_id,
+    utm_params,
+    clid_params,
+    page_context,
+    user_data,
+    event_properties,
+    tracking_cookies,
+    retrieval_source,
+    event_time,
+    report_time,
+    server_time,
+    processed_time,
+    gtm_preview_code,
+    processing_status
+)
 SELECT
     event_id,
     event_type,
@@ -26,6 +45,7 @@ SELECT
     report_time,
     server_time,
     CURRENT_TIMESTAMP AS processed_time,
+    gtm_preview_code,
     'deduplicated' AS processing_status
 FROM (
     SELECT
@@ -43,6 +63,7 @@ FROM (
         event_time,
         report_time,
         server_time,
+        gtm_preview_code,
         ROW_NUMBER() OVER (
             PARTITION BY event_id
             ORDER BY event_time DESC
@@ -52,7 +73,28 @@ FROM (
 WHERE row_num = 1;
 
 -- Sink 2: 写入 S3 Iceberg (原始数据，upsert 去重)
-INSERT INTO iceberg_catalog.raw_events.events_s3_v5
+-- 注意：显式指定列名以避免 schema evolution 导致的列顺序问题
+INSERT INTO iceberg_catalog.raw_events.events_s3_v5 (
+    event_id,
+    event_type,
+    user_id,
+    anonymous_id,
+    utm_params,
+    clid_params,
+    page_context,
+    user_data,
+    event_properties,
+    tracking_cookies,
+    retrieval_source,
+    event_time,
+    report_time,
+    server_time,
+    processed_time,
+    gtm_preview_code,
+    processing_status,
+    dt,
+    hr
+)
 SELECT
     event_id,
     event_type,
@@ -69,9 +111,10 @@ SELECT
     report_time,
     server_time,
     CURRENT_TIMESTAMP AS processed_time,
+    gtm_preview_code,
     'raw' AS processing_status,
-    DATE_FORMAT(CURRENT_TIMESTAMP, 'yyyy-MM-dd') AS dt,
-    DATE_FORMAT(CURRENT_TIMESTAMP, 'HH') AS hr
+    DATE_FORMAT(CURRENT_TIMESTAMP + INTERVAL '8' HOUR, 'yyyy-MM-dd') AS dt,  -- 北京时间 UTC+8
+    DATE_FORMAT(CURRENT_TIMESTAMP + INTERVAL '8' HOUR, 'HH') AS hr           -- 北京时间 UTC+8
 FROM raw_events;
 
 -- Sink 3: 写入 DynamoDB (点击事件去重)

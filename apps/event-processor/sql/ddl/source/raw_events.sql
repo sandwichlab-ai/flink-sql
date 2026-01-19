@@ -25,7 +25,10 @@ CREATE TABLE raw_events (
     event_time BIGINT,                  -- 事件发生时间（Unix 秒级时间戳）
     report_time BIGINT,                 -- 事件上报时间（Unix 秒级时间戳）
     server_time BIGINT,                 -- 服务器接收时间（Unix 秒级时间戳）
-    
+
+    -- ========== GTM 调试参数 ==========
+    gtm_preview_code STRING,            -- GTM Server Preview 调试参数
+
     -- ========== Kafka 元数据 ==========
     `partition` INT METADATA FROM 'partition' VIRTUAL,
     `offset` BIGINT METADATA FROM 'offset' VIRTUAL
