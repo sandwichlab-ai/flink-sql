@@ -7,6 +7,8 @@ import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Map;
+
 /**
  * Flink Event Processor Job
  *
@@ -31,8 +33,8 @@ public class EventProcessorJob {
         // 创建 SQL 加载器
         SqlLoader sqlLoader = new SqlLoader(config.toSqlVariables());
 
-        // 创建 Flink 环境
-        StreamTableEnvironment tableEnv = createTableEnvironment();
+        // 创建 Flink 环境（传递配置给 UDF）
+        StreamTableEnvironment tableEnv = createTableEnvironment(config);
 
         // 执行 SQL
         executeJob(tableEnv, sqlLoader);
@@ -40,9 +42,17 @@ public class EventProcessorJob {
         LOG.info("Job started successfully");
     }
 
-    private static StreamTableEnvironment createTableEnvironment() {
+    private static StreamTableEnvironment createTableEnvironment(JobConfig config) {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.enableCheckpointing(60000);
+
+        // 将配置传递给 GlobalJobParameters，供 UDF 通过 FunctionContext.getJobParameter() 获取
+        org.apache.flink.configuration.Configuration globalParams = new org.apache.flink.configuration.Configuration();
+        for (Map.Entry<String, String> entry : config.toSqlVariables().entrySet()) {
+            globalParams.setString(entry.getKey(), entry.getValue());
+            LOG.info("Setting GlobalJobParameter: {} = {}", entry.getKey(), entry.getValue());
+        }
+        env.getConfig().setGlobalJobParameters(globalParams);
 
         EnvironmentSettings settings = EnvironmentSettings.newInstance()
                 .inStreamingMode()
