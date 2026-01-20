@@ -29,6 +29,10 @@ CREATE TABLE raw_events (
     -- ========== GTM 调试参数 ==========
     gtm_preview_code STRING,            -- GTM Server Preview 调试参数
 
+    -- ========== Event Time + Watermark ==========
+    event_timestamp AS TO_TIMESTAMP_LTZ(event_time, 0),  -- 将秒级时间戳转换为 TIMESTAMP
+    WATERMARK FOR event_timestamp AS event_timestamp - INTERVAL '5' SECOND,  -- 允许 5 秒乱序
+
     -- ========== Kafka 元数据 ==========
     `partition` INT METADATA FROM 'partition' VIRTUAL,
     `offset` BIGINT METADATA FROM 'offset' VIRTUAL

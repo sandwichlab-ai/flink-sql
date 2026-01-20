@@ -80,8 +80,12 @@ public class EventProcessorJob {
         LOG.info("Creating sink table: click_events_ddb (DynamoDB)");
         tableEnv.executeSql(sqlLoader.load("sql/ddl/sink/click_events_ddb.sql"));
 
-        // DML: 执行去重逻辑，使用 UDF 先写 DynamoDB，再写 Kafka 和 S3
-        LOG.info("Executing deduplication with UDF (DDB first, then Kafka + S3)");
+        // DML: 创建中间 View（通过 UDF 写入 DynamoDB）
+        LOG.info("Creating temporary view: click_events_with_ddb (DDB write via UDF)");
+        tableEnv.executeSql(sqlLoader.load("sql/dml/click_events_with_ddb_view.sql"));
+
+        // DML: 执行去重逻辑，从 View 读取后写入 Kafka 和 S3
+        LOG.info("Executing deduplication (Kafka + S3 sinks)");
         tableEnv.executeSql(sqlLoader.load("sql/dml/dedup_with_udf.sql"));
     }
 }
