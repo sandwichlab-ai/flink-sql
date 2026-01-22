@@ -22,11 +22,12 @@ import java.util.Map;
  *     *,
  *     ddb_write(
  *         fingerprint,     -- PK
- *         click_time,      -- SK
+ *         click_time,
  *         user_id,
  *         click_id,
- *         click_id_name,
- *         utm_params       -- MAP 类型
+ *         click_id_name,   -- SK
+ *         utm_params,      -- MAP 类型
+ *         event_id         -- 事件 ID（用于链路追踪）
  *     ) AS written
  * FROM raw_events;
  * </pre>
@@ -64,11 +65,12 @@ public class DdbWriteUdf extends ScalarFunction {
      * 写入 DynamoDB 并返回 fingerprint（passthrough）
      *
      * @param fingerprint   用户指纹 (Partition Key)
-     * @param clickTime     点击时间 (Sort Key)
+     * @param clickTime     点击时间
      * @param userId        用户 ID
      * @param clickId       点击 ID
-     * @param clickIdName   点击 ID 名称 (gclid, fbclid 等)
+     * @param clickIdName   点击 ID 名称 (gclid, fbclid 等) (Sort Key)
      * @param utmParams     UTM 参数 (MAP 类型)
+     * @param eventId       事件 ID（用于链路追踪）
      * @return fingerprint（透传，确保下游可以继续处理）
      */
     public String eval(
@@ -77,37 +79,43 @@ public class DdbWriteUdf extends ScalarFunction {
             String userId,
             String clickId,
             String clickIdName,
-            Map<String, String> utmParams) {
+            Map<String, String> utmParams,
+            String eventId) {
 
-        if (fingerprint == null || clickTime == null) {
-            LOG.warn("Skipping write: fingerprint or clickTime is null");
+        if (fingerprint == null || clickIdName == null) {
+            LOG.warn("Skipping write: fingerprint or clickIdName is null");
             return fingerprint;
         }
 
-        // 构建 keys
+        // 构建 keys (PK: fingerprint, SK: click_id_name)
         Map<String, Object> keys = new HashMap<>();
         keys.put("fingerprint", fingerprint);
-        keys.put("click_time", clickTime);
+        keys.put("click_id_name", clickIdName);
 
         // 构建 values
         Map<String, Object> values = new HashMap<>();
+        if (clickTime != null) {
+            values.put("click_time", clickTime);
+        }
         if (userId != null) {
             values.put("user_id", userId);
         }
         if (clickId != null) {
             values.put("click_id", clickId);
         }
-        if (clickIdName != null) {
-            values.put("click_id_name", clickIdName);
-        }
         if (utmParams != null && !utmParams.isEmpty()) {
             values.put("utm_json", utmParams);
         }
+        if (eventId != null) {
+            values.put("event_id", eventId);
+        }
+        // 自动添加写入时间戳
+        values.put("updated_at", System.currentTimeMillis());
 
         // 执行写入
         boolean success = operator.execute(keys, values);
         if (!success) {
-            LOG.warn("DDB write failed for fingerprint={}, clickTime={}", fingerprint, clickTime);
+            LOG.warn("DDB write failed for fingerprint={}, clickIdName={}", fingerprint, clickIdName);
         }
 
         // 透传 fingerprint
@@ -115,7 +123,20 @@ public class DdbWriteUdf extends ScalarFunction {
     }
 
     /**
-     * 重载：不带 UTM 参数
+     * 重载：不带 eventId
+     */
+    public String eval(
+            String fingerprint,
+            Long clickTime,
+            String userId,
+            String clickId,
+            String clickIdName,
+            Map<String, String> utmParams) {
+        return eval(fingerprint, clickTime, userId, clickId, clickIdName, utmParams, null);
+    }
+
+    /**
+     * 重载：不带 UTM 参数和 eventId
      */
     public String eval(
             String fingerprint,
@@ -123,6 +144,6 @@ public class DdbWriteUdf extends ScalarFunction {
             String userId,
             String clickId,
             String clickIdName) {
-        return eval(fingerprint, clickTime, userId, clickId, clickIdName, null);
+        return eval(fingerprint, clickTime, userId, clickId, clickIdName, null, null);
     }
 }

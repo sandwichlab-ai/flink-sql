@@ -28,7 +28,8 @@ SELECT
         user_id,
         v,
         k,
-        utm_params
+        utm_params,
+        event_id
     ) AS ddb_written
 FROM (
     SELECT
@@ -36,8 +37,8 @@ FROM (
         t.k,
         t.v,
         ROW_NUMBER() OVER (
-            PARTITION BY anonymous_id, user_id, t.v, clid_params[t.k || '_timestamp']
-            ORDER BY event_time DESC
+            PARTITION BY anonymous_id, t.k
+            ORDER BY CAST(clid_params[t.k || '_timestamp'] AS BIGINT) DESC
         ) AS row_num
     FROM raw_events
     CROSS JOIN UNNEST(raw_events.clid_params) AS t(k, v)
