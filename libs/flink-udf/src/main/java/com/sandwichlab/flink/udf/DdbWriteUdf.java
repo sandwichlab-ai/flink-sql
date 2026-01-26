@@ -112,6 +112,13 @@ public class DdbWriteUdf extends ScalarFunction {
         // 自动添加写入时间戳
         values.put("updated_at", System.currentTimeMillis());
 
+        // 添加 TTL 过期时间（click_time + 30天，秒级）
+        // DynamoDB TTL 会自动删除过期数据
+        if (clickTime != null) {
+            long ttlSeconds = (clickTime / 1000) + (30L * 24 * 60 * 60);
+            values.put("expire_at", ttlSeconds);
+        }
+
         // 执行写入
         boolean success = operator.execute(keys, values);
         if (!success) {

@@ -90,9 +90,9 @@ public class EventProcessorJob {
         LOG.info("Creating sink table: click_events_ddb (DynamoDB)");
         tableEnv.executeSql(sqlLoader.load("sql/ddl/sink/click_events_ddb.sql"));
 
-        // DML: 创建中间 View（通过 UDF 写入 DynamoDB）
-        LOG.info("Creating temporary view: click_events_with_ddb (DDB write via UDF)");
-        tableEnv.executeSql(sqlLoader.load("sql/dml/click_events_with_ddb_view.sql"));
+        // DML: 创建中间 View（处理有 clid 的事件，row_num=1 写 DDB，row_num=2 不写）
+        LOG.info("Creating temporary view: click_events_with_clid");
+        tableEnv.executeSql(sqlLoader.load("sql/dml/click_events_with_clid_view.sql"));
 
         // DML: 执行去重逻辑，从 View 读取后写入 Kafka 和 S3
         LOG.info("Executing deduplication (Kafka + S3 sinks)");

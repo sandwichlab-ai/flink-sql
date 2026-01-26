@@ -13,6 +13,7 @@ CREATE TABLE click_events_ddb (
     utm_json MAP<STRING, STRING>,       -- UTM 参数 (Original Map)
     event_id STRING,                    -- 事件 ID（用于链路追踪）
     updated_at BIGINT,                  -- 记录写入/更新时间戳
+    expire_at BIGINT,                   -- TTL 过期时间（click_time + 30天，秒级）
 
     PRIMARY KEY (fingerprint, click_id_name) NOT ENFORCED
 ) WITH (
