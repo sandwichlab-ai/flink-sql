@@ -36,6 +36,7 @@ s3:
 kafka:
   input_topic: raw-events
   output_topic: processed-events
+  attributed_topic: attributed-events
 
 dynamodb:
   table_name: click_events_dev

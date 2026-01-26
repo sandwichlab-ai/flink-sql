@@ -25,6 +25,7 @@ public class JobConfig {
     private final String bootstrapServers;
     private final String inputTopic;
     private final String outputTopic;
+    private final String attributedTopic;
     private final String awsRegion;
     private final String ddbTableName;
 
@@ -34,6 +35,7 @@ public class JobConfig {
         this.bootstrapServers = props.getOrDefault("BOOTSTRAP_SERVERS", "localhost:9092");
         this.inputTopic = props.getOrDefault("INPUT_TOPIC", "raw-events");
         this.outputTopic = props.getOrDefault("OUTPUT_TOPIC", "processed-events");
+        this.attributedTopic = props.getOrDefault("ATTRIBUTED_TOPIC", "attributed-events");
         this.awsRegion = props.getOrDefault("AWS_REGION", "us-west-2");
         this.ddbTableName = props.getOrDefault("DDB_TABLE_NAME", "click_events");
     }
@@ -60,6 +62,7 @@ public class JobConfig {
         props.put("BOOTSTRAP_SERVERS", getEnvOrProperty("BOOTSTRAP_SERVERS", "localhost:9092"));
         props.put("INPUT_TOPIC", getEnvOrProperty("INPUT_TOPIC", "raw-events"));
         props.put("OUTPUT_TOPIC", getEnvOrProperty("OUTPUT_TOPIC", "processed-events"));
+        props.put("ATTRIBUTED_TOPIC", getEnvOrProperty("ATTRIBUTED_TOPIC", "attributed-events"));
         props.put("AWS_REGION", getEnvOrProperty("AWS_REGION", "us-west-2"));
         props.put("DDB_TABLE_NAME", getEnvOrProperty("DDB_TABLE_NAME", "click_events"));
 
@@ -91,11 +94,16 @@ public class JobConfig {
         return outputTopic;
     }
 
+    public String getAttributedTopic() {
+        return attributedTopic;
+    }
+
     public Map<String, String> toSqlVariables() {
         Map<String, String> variables = new HashMap<>();
         variables.put("BOOTSTRAP_SERVERS", bootstrapServers);
         variables.put("INPUT_TOPIC", inputTopic);
         variables.put("OUTPUT_TOPIC", outputTopic);
+        variables.put("ATTRIBUTED_TOPIC", attributedTopic);
         variables.put("AWS_REGION", awsRegion);
         variables.put("DDB_TABLE_NAME", ddbTableName);
 
@@ -105,8 +113,8 @@ public class JobConfig {
     @Override
     public String toString() {
         return String.format(
-            "JobConfig{bootstrapServers='%s', inputTopic='%s', outputTopic='%s', awsRegion='%s', ddbTableName='%s'}",
-            bootstrapServers, inputTopic, outputTopic, awsRegion, ddbTableName
+            "JobConfig{bootstrapServers='%s', inputTopic='%s', outputTopic='%s', attributedTopic='%s', awsRegion='%s', ddbTableName='%s'}",
+            bootstrapServers, inputTopic, outputTopic, attributedTopic, awsRegion, ddbTableName
         );
     }
 }

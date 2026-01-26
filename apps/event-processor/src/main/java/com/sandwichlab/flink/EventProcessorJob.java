@@ -1,6 +1,5 @@
 package com.sandwichlab.flink;
 
-import com.sandwichlab.flink.udf.DdbWriteUdf;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.table.api.EnvironmentSettings;
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
@@ -28,7 +27,7 @@ public class EventProcessorJob {
         // 确保 Kafka Topics 存在（在启动 Flink SQL 前创建）
         LOG.info("Ensuring Kafka topics exist...");
         KafkaTopicManager topicManager = new KafkaTopicManager(config.getBootstrapServers());
-        topicManager.ensureTopicsExist(config.getInputTopic(), config.getOutputTopic());
+        topicManager.ensureTopicsExist(config.getInputTopic(), config.getOutputTopic(), config.getAttributedTopic());
 
         // 创建 SQL 加载器
         SqlLoader sqlLoader = new SqlLoader(config.toSqlVariables());
@@ -62,10 +61,6 @@ public class EventProcessorJob {
     }
 
     private static void executeJob(StreamTableEnvironment tableEnv, SqlLoader sqlLoader) {
-        // 注册 UDF
-        LOG.info("Registering UDF: ddb_write");
-        tableEnv.createTemporarySystemFunction("ddb_write", DdbWriteUdf.class);
-
         // DDL: 创建源表
         LOG.info("Creating source table: raw_events");
         tableEnv.executeSql(sqlLoader.load("sql/ddl/source/raw_events.sql"));
@@ -86,16 +81,16 @@ public class EventProcessorJob {
         LOG.info("Creating sink table: events_s3 (Iceberg)");
         tableEnv.executeSql(sqlLoader.load("sql/ddl/sink/events_s3.sql"));
 
-        // DDL: 创建 DynamoDB Sink 表
-        LOG.info("Creating sink table: click_events_ddb (DynamoDB)");
-        tableEnv.executeSql(sqlLoader.load("sql/ddl/sink/click_events_ddb.sql"));
+        // DDL: 创建归因事件源表 (Kafka)
+        LOG.info("Creating source table: attributed_events (Kafka)");
+        tableEnv.executeSql(sqlLoader.load("sql/ddl/source/attributed_events.sql"));
 
-        // DML: 创建中间 View（处理有 clid 的事件，row_num=1 写 DDB，row_num=2 不写）
-        LOG.info("Creating temporary view: click_events_with_clid");
-        tableEnv.executeSql(sqlLoader.load("sql/dml/click_events_with_clid_view.sql"));
+        // DDL: 创建归因事件 Sink 表 (Iceberg)
+        LOG.info("Creating sink table: attributed_events (Iceberg)");
+        tableEnv.executeSql(sqlLoader.load("sql/ddl/sink/attributed_events_s3.sql"));
 
-        // DML: 执行去重逻辑，从 View 读取后写入 Kafka 和 S3
-        LOG.info("Executing deduplication (Kafka + S3 sinks)");
+        // DML: 执行去重逻辑，写入 Kafka、S3 和归因事件
+        LOG.info("Executing deduplication (Kafka + S3 + Attribution sinks)");
         tableEnv.executeSql(sqlLoader.load("sql/dml/dedup_with_udf.sql"));
     }
 }
