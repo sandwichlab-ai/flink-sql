@@ -29,11 +29,14 @@ CREATE TABLE attributed_events (
     -- ========== GTM 调试参数 ==========
     gtm_preview_code STRING,
 
-    -- ========== 归因字段 (新增) ==========
+    -- ========== 归因字段 ==========
     source STRING,                      -- 归因来源: google, facebook 等
     click_id STRING,                    -- 点击 ID
     click_time BIGINT,                  -- 点击时间 (Unix 秒级时间戳)
     click_id_name STRING,               -- 点击 ID 类型: gclid, fbclid 等
+    is_attributed INT,                  -- 是否归因: 0=未归因, 1=已归因
+    attribution_model STRING,           -- 归因策略/模型: last_click
+    attribution_window STRING,          -- 归因窗口: 7d
 
     -- ========== Event Time + Watermark ==========
     event_timestamp AS TO_TIMESTAMP_LTZ(event_time, 0),

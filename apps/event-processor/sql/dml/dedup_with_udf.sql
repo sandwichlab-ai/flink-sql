@@ -142,7 +142,7 @@ FROM (
 WHERE row_num = 1;
 
 -- Sink 3: 写入归因事件到 Iceberg (从 Data Gather 回写)
-INSERT INTO iceberg_catalog.raw_events.attributed_events (
+INSERT INTO iceberg_catalog.raw_events.attributed_events_v3 (
     event_id,
     event_type,
     user_id,
@@ -163,6 +163,9 @@ INSERT INTO iceberg_catalog.raw_events.attributed_events (
     click_id,
     click_time,
     click_id_name,
+    is_attributed,
+    attribution_model,
+    attribution_window,
     processing_status,
     dt,
     hr
@@ -188,6 +191,9 @@ SELECT
     click_id,
     click_time,
     click_id_name,
+    is_attributed,
+    attribution_model,
+    attribution_window,
     'attributed' AS processing_status,
     DATE_FORMAT(CURRENT_TIMESTAMP + INTERVAL '8' HOUR, 'yyyy-MM-dd') AS dt,  -- 北京时间 UTC+8
     DATE_FORMAT(CURRENT_TIMESTAMP + INTERVAL '8' HOUR, 'HH') AS hr           -- 北京时间 UTC+8
@@ -212,6 +218,9 @@ FROM (
         click_id,
         click_time,
         click_id_name,
+        is_attributed,
+        attribution_model,
+        attribution_window,
         ROW_NUMBER() OVER (
             PARTITION BY event_id
             ORDER BY event_time ASC

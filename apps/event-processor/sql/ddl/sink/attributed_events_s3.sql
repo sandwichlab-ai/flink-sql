@@ -3,7 +3,7 @@
 -- 归因事件归档到 S3，支持 Upsert 去重
 -- ============================================================
 
-CREATE TABLE IF NOT EXISTS iceberg_catalog.raw_events.attributed_events (
+CREATE TABLE IF NOT EXISTS iceberg_catalog.raw_events.attributed_events_v3 (
     -- ========== 事件标识 ==========
     event_id STRING,
     event_type STRING,
@@ -30,11 +30,14 @@ CREATE TABLE IF NOT EXISTS iceberg_catalog.raw_events.attributed_events (
     -- ========== GTM 调试参数 ==========
     gtm_preview_code STRING,
 
-    -- ========== 归因字段 (新增) ==========
+    -- ========== 归因字段 ==========
     source STRING,                      -- 归因来源: google, facebook 等
     click_id STRING,                    -- 点击 ID
     click_time BIGINT,                  -- 点击时间
     click_id_name STRING,               -- 点击 ID 类型
+    is_attributed INT,                  -- 是否归因: 0=未归因, 1=已归因
+    attribution_model STRING,           -- 归因策略/模型: last_click
+    attribution_window STRING,          -- 归因窗口: 7d
 
     -- ========== 处理元数据 ==========
     processing_status STRING,
