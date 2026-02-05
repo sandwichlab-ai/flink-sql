@@ -25,8 +25,12 @@ public class EventProcessorJob {
         LOG.info("Config: {}", config);
 
         // 确保 Kafka Topics 存在（在启动 Flink SQL 前创建）
-        LOG.info("Ensuring Kafka topics exist...");
-        KafkaTopicManager topicManager = new KafkaTopicManager(config.getBootstrapServers());
+        LOG.info("Ensuring Kafka topics exist with {} partitions...", config.getKafkaPartitions());
+        KafkaTopicManager topicManager = new KafkaTopicManager(
+            config.getBootstrapServers(),
+            config.getKafkaPartitions(),
+            (short) 3
+        );
         topicManager.ensureTopicsExist(config.getInputTopic(), config.getOutputTopic(), config.getAttributedTopic());
 
         // 创建 SQL 加载器
@@ -57,7 +61,13 @@ public class EventProcessorJob {
                 .inStreamingMode()
                 .build();
 
-        return StreamTableEnvironment.create(env, settings);
+        StreamTableEnvironment tableEnv = StreamTableEnvironment.create(env, settings);
+
+        // 设置 State TTL 为 2 分钟，超过 2 分钟未更新的状态会被清理
+        tableEnv.getConfig().set("table.exec.state.ttl", "2min");
+        LOG.info("State TTL set to 2 minutes");
+
+        return tableEnv;
     }
 
     private static void executeJob(StreamTableEnvironment tableEnv, SqlLoader sqlLoader) {

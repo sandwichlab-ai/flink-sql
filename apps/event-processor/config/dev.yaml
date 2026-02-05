@@ -11,11 +11,11 @@ app:
 
 flink:
   runtime: FLINK-1_20
-  parallelism: 1
+  parallelism: 3
   parallelism_per_kpu: 1
   autoscaling_enabled: false
-  min_parallelism: 1
-  max_parallelism: 4
+  min_parallelism: 3
+  max_parallelism: 3
 
 iam:
   execution_role_arn: arn:aws:iam::856969325542:role/lexi2-dev-usw2-856969325542-flink-execution-role
@@ -37,6 +37,8 @@ kafka:
   input_topic: raw-events
   output_topic: processed-events
   attributed_topic: attributed-events
+  partitions: 3  # Kafka 分区数，与 parallelism 一致
+  max_poll_records: 100  # 每次 poll 最大记录数（间接控制消费速度）
 
 dynamodb:
   table_name: click_events_dev

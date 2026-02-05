@@ -28,6 +28,8 @@ public class JobConfig {
     private final String attributedTopic;
     private final String awsRegion;
     private final String ddbTableName;
+    private final int kafkaPartitions;
+    private final String maxPollRecords;
 
     public JobConfig(String[] args) {
         Map<String, String> props = loadProperties();
@@ -38,6 +40,8 @@ public class JobConfig {
         this.attributedTopic = props.getOrDefault("ATTRIBUTED_TOPIC", "attributed-events");
         this.awsRegion = props.getOrDefault("AWS_REGION", "us-west-2");
         this.ddbTableName = props.getOrDefault("DDB_TABLE_NAME", "click_events");
+        this.kafkaPartitions = Integer.parseInt(props.getOrDefault("KAFKA_PARTITIONS", "3"));
+        this.maxPollRecords = props.getOrDefault("MAX_POLL_RECORDS", "100");
     }
 
     private Map<String, String> loadProperties() {
@@ -65,6 +69,8 @@ public class JobConfig {
         props.put("ATTRIBUTED_TOPIC", getEnvOrProperty("ATTRIBUTED_TOPIC", "attributed-events"));
         props.put("AWS_REGION", getEnvOrProperty("AWS_REGION", "us-west-2"));
         props.put("DDB_TABLE_NAME", getEnvOrProperty("DDB_TABLE_NAME", "click_events"));
+        props.put("KAFKA_PARTITIONS", getEnvOrProperty("KAFKA_PARTITIONS", "3"));
+        props.put("MAX_POLL_RECORDS", getEnvOrProperty("MAX_POLL_RECORDS", "100"));
 
         LOG.info("Loaded properties from env/system: {}", props);
         return props;
@@ -98,6 +104,10 @@ public class JobConfig {
         return attributedTopic;
     }
 
+    public int getKafkaPartitions() {
+        return kafkaPartitions;
+    }
+
     public Map<String, String> toSqlVariables() {
         Map<String, String> variables = new HashMap<>();
         variables.put("BOOTSTRAP_SERVERS", bootstrapServers);
@@ -106,15 +116,20 @@ public class JobConfig {
         variables.put("ATTRIBUTED_TOPIC", attributedTopic);
         variables.put("AWS_REGION", awsRegion);
         variables.put("DDB_TABLE_NAME", ddbTableName);
+        variables.put("MAX_POLL_RECORDS", maxPollRecords);
 
         return variables;
+    }
+
+    public String getMaxPollRecords() {
+        return maxPollRecords;
     }
 
     @Override
     public String toString() {
         return String.format(
-            "JobConfig{bootstrapServers='%s', inputTopic='%s', outputTopic='%s', attributedTopic='%s', awsRegion='%s', ddbTableName='%s'}",
-            bootstrapServers, inputTopic, outputTopic, attributedTopic, awsRegion, ddbTableName
+            "JobConfig{bootstrapServers='%s', inputTopic='%s', outputTopic='%s', attributedTopic='%s', awsRegion='%s', ddbTableName='%s', kafkaPartitions=%d, maxPollRecords='%s'}",
+            bootstrapServers, inputTopic, outputTopic, attributedTopic, awsRegion, ddbTableName, kafkaPartitions, maxPollRecords
         );
     }
 }

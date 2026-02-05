@@ -50,6 +50,7 @@ CREATE TABLE raw_events (
 
     -- 消费配置
     'scan.startup.mode' = 'latest-offset',
+    'properties.max.poll.records' = '${MAX_POLL_RECORDS}',  -- 每次 poll 最大记录数（控制消费速度）
     'format' = 'json',
     'json.fail-on-missing-field' = 'false',
     'json.ignore-parse-errors' = 'true',

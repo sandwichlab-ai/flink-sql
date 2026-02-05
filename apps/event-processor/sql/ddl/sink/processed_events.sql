@@ -1,7 +1,7 @@
 -- ============================================================
 -- Sink Table: processed_events
--- 处理后的事件写入 MSK Kafka
--- 分区键: anonymous_id（确保同一用户的事件在同一分区，保证顺序）
+-- 处理后的事件写入 MSK Kafka (upsert 模式)
+-- 主键: (event_id, anonymous_id) 用于去重
 -- ============================================================
 
 CREATE TABLE processed_events (
@@ -32,11 +32,10 @@ CREATE TABLE processed_events (
     gtm_preview_code STRING,            -- GTM Server Preview 调试参数
 
     -- ========== 处理元数据 ==========
-    processing_status STRING,    -- success, filtered, deduplicated
+    processing_status STRING,     -- success, filtered, deduplicated
 
-    -- ========== 主键 (用于 Kafka 分区) ==========
-    -- 使用 anonymous_id 作为主键，确保同一用户的事件落在同一分区
-    PRIMARY KEY (anonymous_id) NOT ENFORCED
+    -- ========== 主键（用于 upsert 去重）==========
+    PRIMARY KEY (event_id, anonymous_id) NOT ENFORCED
 ) WITH (
     'connector' = 'upsert-kafka',
     'topic' = '${OUTPUT_TOPIC}',
@@ -48,7 +47,7 @@ CREATE TABLE processed_events (
     'properties.sasl.jaas.config' = 'software.amazon.msk.auth.iam.IAMLoginModule required;',
     'properties.sasl.client.callback.handler.class' = 'software.amazon.msk.auth.iam.IAMClientCallbackHandler',
 
-    -- 格式配置
+    -- Key 和 Value 格式
     'key.format' = 'json',
     'value.format' = 'json'
 );

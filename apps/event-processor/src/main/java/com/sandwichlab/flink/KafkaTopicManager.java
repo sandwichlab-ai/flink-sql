@@ -25,7 +25,7 @@ public class KafkaTopicManager {
     private final short replicationFactor;
 
     public KafkaTopicManager(String bootstrapServers) {
-        this(bootstrapServers, 3, (short) 3);
+        this(bootstrapServers, 3, (short) 3);  // 默认 3 分区
     }
 
     public KafkaTopicManager(String bootstrapServers, int numPartitions, short replicationFactor) {

@@ -29,6 +29,9 @@ BOOTSTRAP_SERVERS := $(shell yq '.msk.bootstrap_servers' $(CONFIG_FILE))
 CODE_BUCKET := $(shell yq '.s3.code_bucket' $(CONFIG_FILE))
 INPUT_TOPIC := $(shell yq '.kafka.input_topic' $(CONFIG_FILE))
 OUTPUT_TOPIC := $(shell yq '.kafka.output_topic' $(CONFIG_FILE))
+ATTRIBUTED_TOPIC := $(shell yq '.kafka.attributed_topic' $(CONFIG_FILE))
+KAFKA_PARTITIONS := $(shell yq '.kafka.partitions // 3' $(CONFIG_FILE))
+MAX_POLL_RECORDS := $(shell yq '.kafka.max_poll_records // 100' $(CONFIG_FILE))
 DDB_TABLE_NAME := $(shell yq '.dynamodb.table_name' $(CONFIG_FILE))
 CLOUDWATCH_LOG_GROUP := $(shell yq '.logging.log_group' $(CONFIG_FILE))
 
@@ -159,8 +162,11 @@ create-app: build upload-jar create-log-group ## 创建 Flink 应用
 						\"BOOTSTRAP_SERVERS\": \"$(BOOTSTRAP_SERVERS)\", \
 						\"INPUT_TOPIC\": \"$(INPUT_TOPIC)\", \
 						\"OUTPUT_TOPIC\": \"$(OUTPUT_TOPIC)\", \
+						\"ATTRIBUTED_TOPIC\": \"$(ATTRIBUTED_TOPIC)\", \
 						\"AWS_REGION\": \"$(AWS_REGION)\", \
-						\"DDB_TABLE_NAME\": \"$(DDB_TABLE_NAME)\" \
+						\"DDB_TABLE_NAME\": \"$(DDB_TABLE_NAME)\", \
+						\"KAFKA_PARTITIONS\": \"$(KAFKA_PARTITIONS)\", \
+						\"MAX_POLL_RECORDS\": \"$(MAX_POLL_RECORDS)\" \
 					} \
 				}] \
 			}, \

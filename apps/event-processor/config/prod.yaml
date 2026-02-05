@@ -11,11 +11,11 @@ app:
 
 flink:
   runtime: FLINK-1_20
-  parallelism: 4
+  parallelism: 3
   parallelism_per_kpu: 1
   autoscaling_enabled: true
-  min_parallelism: 2
-  max_parallelism: 16
+  min_parallelism: 3
+  max_parallelism: 3
 
 iam:
   # TODO: 更新为 prod 环境的 role
@@ -39,6 +39,7 @@ kafka:
   input_topic: raw-events
   output_topic: processed-events
   attributed_topic: attributed-events
+  partitions: 3  # Kafka 分区数，与 parallelism 一致
 
 dynamodb:
   table_name: click_events_prod
