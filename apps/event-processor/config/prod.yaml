@@ -27,7 +27,7 @@ vpc:
     - subnet-08d26e6ce53fe8fe3
     - subnet-0009026f1574931c3
     - subnet-0198d157058ac5754
-  security_group_id: sg-067dd2bc5db39db01
+  security_group_id: sg-067dd2bc5db39db01  # SharedAppSecurityGroup-prod-us (和 MSK 一致)
 
 msk:
   bootstrap_servers: boot-obwbrb0l.c2.kafka-serverless.us-west-2.amazonaws.com:9098
