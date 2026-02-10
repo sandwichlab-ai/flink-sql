@@ -30,6 +30,8 @@ public class JobConfig {
     private final String ddbTableName;
     private final int kafkaPartitions;
     private final String maxPollRecords;
+    private final String icebergWarehouse;
+    private final String icebergDatabase;
 
     public JobConfig(String[] args) {
         Map<String, String> props = loadProperties();
@@ -42,6 +44,8 @@ public class JobConfig {
         this.ddbTableName = props.getOrDefault("DDB_TABLE_NAME", "click_events");
         this.kafkaPartitions = Integer.parseInt(props.getOrDefault("KAFKA_PARTITIONS", "3"));
         this.maxPollRecords = props.getOrDefault("MAX_POLL_RECORDS", "100");
+        this.icebergWarehouse = props.getOrDefault("ICEBERG_WAREHOUSE", "s3://dataware-landing-zone-dev/iceberg/");
+        this.icebergDatabase = props.getOrDefault("ICEBERG_DATABASE", "raw_events");
     }
 
     private Map<String, String> loadProperties() {
@@ -71,6 +75,8 @@ public class JobConfig {
         props.put("DDB_TABLE_NAME", getEnvOrProperty("DDB_TABLE_NAME", "click_events"));
         props.put("KAFKA_PARTITIONS", getEnvOrProperty("KAFKA_PARTITIONS", "3"));
         props.put("MAX_POLL_RECORDS", getEnvOrProperty("MAX_POLL_RECORDS", "100"));
+        props.put("ICEBERG_WAREHOUSE", getEnvOrProperty("ICEBERG_WAREHOUSE", "s3://dataware-landing-zone-dev/iceberg/"));
+        props.put("ICEBERG_DATABASE", getEnvOrProperty("ICEBERG_DATABASE", "raw_events"));
 
         LOG.info("Loaded properties from env/system: {}", props);
         return props;
@@ -117,6 +123,8 @@ public class JobConfig {
         variables.put("AWS_REGION", awsRegion);
         variables.put("DDB_TABLE_NAME", ddbTableName);
         variables.put("MAX_POLL_RECORDS", maxPollRecords);
+        variables.put("ICEBERG_WAREHOUSE", icebergWarehouse);
+        variables.put("ICEBERG_DATABASE", icebergDatabase);
 
         return variables;
     }

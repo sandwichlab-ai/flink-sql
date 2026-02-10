@@ -22,6 +22,8 @@ INSERT INTO processed_events (
     event_properties,
     tracking_cookies,
     retrieval_source,
+    ext_props,
+    fingerprint,
     event_time,
     report_time,
     server_time,
@@ -41,6 +43,8 @@ SELECT
     event_properties,
     tracking_cookies,
     retrieval_source,
+    ext_props,
+    fingerprint,
     event_time,
     report_time,
     server_time,
@@ -60,6 +64,8 @@ FROM (
         event_properties,
         tracking_cookies,
         retrieval_source,
+        ext_props,
+        fingerprint,
         event_time,
         report_time,
         server_time,
@@ -74,7 +80,7 @@ WHERE row_num = 1;
 
 -- Sink 2: 写入 S3 Iceberg (原始数据，upsert 去重)
 -- 注意：显式指定列名以避免 schema evolution 导致的列顺序问题
-INSERT INTO iceberg_catalog.raw_events.events_s3_v5 (
+INSERT INTO iceberg_catalog.${ICEBERG_DATABASE}.events_s3_v5 (
     event_id,
     event_type,
     user_id,
@@ -86,6 +92,8 @@ INSERT INTO iceberg_catalog.raw_events.events_s3_v5 (
     event_properties,
     tracking_cookies,
     retrieval_source,
+    ext_props,
+    fingerprint,
     event_time,
     report_time,
     server_time,
@@ -107,6 +115,8 @@ SELECT
     event_properties,
     tracking_cookies,
     retrieval_source,
+    ext_props,
+    fingerprint,
     event_time,
     report_time,
     server_time,

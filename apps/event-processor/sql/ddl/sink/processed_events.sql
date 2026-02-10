@@ -21,6 +21,10 @@ CREATE TABLE processed_events (
     event_properties MAP<STRING, STRING>,
     tracking_cookies MAP<STRING, STRING>,
     retrieval_source MAP<STRING, STRING>,
+    ext_props MAP<STRING, STRING>,       -- 扩展属性
+
+    -- ========== 设备指纹 ==========
+    fingerprint STRING,                 -- 设备指纹
 
     -- ========== 时间戳（BIGINT 存储 Unix 秒级时间戳）==========
     event_time BIGINT,

@@ -20,7 +20,11 @@ CREATE TABLE raw_events (
     event_properties MAP<STRING, STRING>, -- 事件属性（order_id, value, currency 等）
     tracking_cookies MAP<STRING, STRING>, -- 广告追踪 Cookies（_fbp, _fbc, _ga, _gid, _gcl_aw 等）
     retrieval_source MAP<STRING, STRING>, -- SDK 数据源信息（sdk_key, sdk_version 等）
-    
+    ext_props MAP<STRING, STRING>,       -- 扩展属性
+
+    -- ========== 设备指纹 ==========
+    fingerprint STRING,                 -- 设备指纹
+
     -- ========== 时间字段（BIGINT 存储 Unix 秒级时间戳）==========
     event_time BIGINT,                  -- 事件发生时间（Unix 秒级时间戳）
     report_time BIGINT,                 -- 事件上报时间（Unix 秒级时间戳）

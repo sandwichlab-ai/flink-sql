@@ -3,7 +3,7 @@
 -- 归档事件到 S3 Landing Zone，支持 Upsert 去重
 -- ============================================================
 
-CREATE TABLE IF NOT EXISTS iceberg_catalog.raw_events.events_s3_v5 (
+CREATE TABLE IF NOT EXISTS iceberg_catalog.${ICEBERG_DATABASE}.events_s3_v5 (
     -- ========== 事件标识 ==========
     event_id STRING,
     event_type STRING,
@@ -20,7 +20,11 @@ CREATE TABLE IF NOT EXISTS iceberg_catalog.raw_events.events_s3_v5 (
     event_properties MAP<STRING, STRING>,
     tracking_cookies MAP<STRING, STRING>,
     retrieval_source MAP<STRING, STRING>,
-    
+    ext_props MAP<STRING, STRING>,       -- 扩展属性
+
+    -- ========== 设备指纹 ==========
+    fingerprint STRING,                  -- 设备指纹
+
     -- ========== 时间字段（BIGINT 存储 Unix 秒级时间戳）==========
     event_time BIGINT,                  -- 事件发生时间（Unix 秒级时间戳）
     report_time BIGINT,                 -- 事件上报时间（Unix 秒级时间戳）

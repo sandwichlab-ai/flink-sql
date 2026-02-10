@@ -33,6 +33,10 @@ msk:
 s3:
   code_bucket: lexi2-dev-usw2-856969325542-flink-code
 
+iceberg:
+  warehouse: s3://dataware-landing-zone-dev/iceberg/
+  database: raw_events
+
 kafka:
   input_topic: raw-events
   output_topic: processed-events

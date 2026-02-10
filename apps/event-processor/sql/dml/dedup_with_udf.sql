@@ -24,6 +24,8 @@ INSERT INTO processed_events (
     event_properties,
     tracking_cookies,
     retrieval_source,
+    ext_props,
+    fingerprint,
     event_time,
     report_time,
     server_time,
@@ -43,6 +45,8 @@ SELECT
     event_properties,
     tracking_cookies,
     retrieval_source,
+    ext_props,
+    fingerprint,
     event_time,
     report_time,
     server_time,
@@ -62,6 +66,8 @@ FROM (
         event_properties,
         tracking_cookies,
         retrieval_source,
+        ext_props,
+        fingerprint,
         event_time,
         report_time,
         server_time,
@@ -75,7 +81,7 @@ FROM (
 WHERE row_num = 1;
 
 -- Sink 2: 写入 S3 Iceberg (原始数据，按 event_id 去重)
-INSERT INTO iceberg_catalog.raw_events.events_s3_v5 (
+INSERT INTO iceberg_catalog.${ICEBERG_DATABASE}.events_s3_v5 (
     event_id,
     event_type,
     user_id,
@@ -87,6 +93,8 @@ INSERT INTO iceberg_catalog.raw_events.events_s3_v5 (
     event_properties,
     tracking_cookies,
     retrieval_source,
+    ext_props,
+    fingerprint,
     event_time,
     report_time,
     server_time,
@@ -108,6 +116,8 @@ SELECT
     event_properties,
     tracking_cookies,
     retrieval_source,
+    ext_props,
+    fingerprint,
     event_time,
     report_time,
     server_time,
@@ -129,6 +139,8 @@ FROM (
         event_properties,
         tracking_cookies,
         retrieval_source,
+        ext_props,
+        fingerprint,
         event_time,
         report_time,
         server_time,
@@ -142,7 +154,7 @@ FROM (
 WHERE row_num = 1;
 
 -- Sink 3: 写入归因事件到 Iceberg (从 Data Gather 回写)
-INSERT INTO iceberg_catalog.raw_events.attributed_events_v3 (
+INSERT INTO iceberg_catalog.${ICEBERG_DATABASE}.attributed_events_v3 (
     event_id,
     event_type,
     user_id,
@@ -154,6 +166,8 @@ INSERT INTO iceberg_catalog.raw_events.attributed_events_v3 (
     event_properties,
     tracking_cookies,
     retrieval_source,
+    ext_props,
+    fingerprint,
     event_time,
     report_time,
     server_time,
@@ -182,6 +196,8 @@ SELECT
     event_properties,
     tracking_cookies,
     retrieval_source,
+    ext_props,
+    fingerprint,
     event_time,
     report_time,
     server_time,
@@ -210,6 +226,8 @@ FROM (
         event_properties,
         tracking_cookies,
         retrieval_source,
+        ext_props,
+        fingerprint,
         event_time,
         report_time,
         server_time,

@@ -22,18 +22,22 @@ iam:
   execution_role_arn: arn:aws:iam::879794963971:role/lexi2-prod-usw2-879794963971-flink-execution-role
 
 vpc:
-  # TODO: 更新为 prod 环境的 VPC
-  vpc_id: vpc-xxx
+  vpc_id: vpc-0a4f11f2a99810ac4
   subnet_ids:
-    - subnet-xxx
-    - subnet-xxx
-  security_group_id: sg-xxx
+    - subnet-08d26e6ce53fe8fe3
+    - subnet-0009026f1574931c3
+    - subnet-0198d157058ac5754
+  security_group_id: sg-067dd2bc5db39db01
 
 msk:
-  bootstrap_servers: boot-xxx.kafka-serverless.us-west-2.amazonaws.com:9098
+  bootstrap_servers: boot-obwbrb0l.c2.kafka-serverless.us-west-2.amazonaws.com:9098
 
 s3:
   code_bucket: lexi2-prod-usw2-879794963971-flink-code
+
+iceberg:
+  warehouse: s3://dataware-landing-zone-prod/iceberg/
+  database: raw_events_prod
 
 kafka:
   input_topic: raw-events

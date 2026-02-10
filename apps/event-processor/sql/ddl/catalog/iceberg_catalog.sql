@@ -6,7 +6,7 @@
 
 CREATE CATALOG iceberg_catalog WITH (
     'type' = 'iceberg',
-    'warehouse' = 's3://dataware-landing-zone-dev/iceberg/',
+    'warehouse' = '${ICEBERG_WAREHOUSE}',
     'catalog-impl' = 'org.apache.iceberg.aws.glue.GlueCatalog',
     'io-impl' = 'org.apache.iceberg.aws.s3.S3FileIO',
     'glue.id' = '809574936716'

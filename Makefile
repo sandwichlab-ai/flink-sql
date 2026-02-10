@@ -34,6 +34,8 @@ KAFKA_PARTITIONS := $(shell yq '.kafka.partitions // 3' $(CONFIG_FILE))
 MAX_POLL_RECORDS := $(shell yq '.kafka.max_poll_records // 100' $(CONFIG_FILE))
 DDB_TABLE_NAME := $(shell yq '.dynamodb.table_name' $(CONFIG_FILE))
 CLOUDWATCH_LOG_GROUP := $(shell yq '.logging.log_group' $(CONFIG_FILE))
+ICEBERG_WAREHOUSE := $(shell yq '.iceberg.warehouse' $(CONFIG_FILE))
+ICEBERG_DATABASE := $(shell yq '.iceberg.database // "raw_events"' $(CONFIG_FILE))
 
 # ==================== 构建配置 ====================
 JAR_NAME := $(APP)-1.0.0.jar
@@ -166,7 +168,9 @@ create-app: build upload-jar create-log-group ## 创建 Flink 应用
 						\"AWS_REGION\": \"$(AWS_REGION)\", \
 						\"DDB_TABLE_NAME\": \"$(DDB_TABLE_NAME)\", \
 						\"KAFKA_PARTITIONS\": \"$(KAFKA_PARTITIONS)\", \
-						\"MAX_POLL_RECORDS\": \"$(MAX_POLL_RECORDS)\" \
+						\"MAX_POLL_RECORDS\": \"$(MAX_POLL_RECORDS)\", \
+						\"ICEBERG_WAREHOUSE\": \"$(ICEBERG_WAREHOUSE)\", \
+						\"ICEBERG_DATABASE\": \"$(ICEBERG_DATABASE)\" \
 					} \
 				}] \
 			}, \

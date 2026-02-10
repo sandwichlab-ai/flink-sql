@@ -3,7 +3,7 @@
 -- 归因事件归档到 S3，支持 Upsert 去重
 -- ============================================================
 
-CREATE TABLE IF NOT EXISTS iceberg_catalog.raw_events.attributed_events_v3 (
+CREATE TABLE IF NOT EXISTS iceberg_catalog.${ICEBERG_DATABASE}.attributed_events_v3 (
     -- ========== 事件标识 ==========
     event_id STRING,
     event_type STRING,
@@ -20,6 +20,10 @@ CREATE TABLE IF NOT EXISTS iceberg_catalog.raw_events.attributed_events_v3 (
     event_properties MAP<STRING, STRING>,
     tracking_cookies MAP<STRING, STRING>,
     retrieval_source MAP<STRING, STRING>,
+    ext_props MAP<STRING, STRING>,       -- 扩展属性
+
+    -- ========== 设备指纹 ==========
+    fingerprint STRING,                  -- 设备指纹
 
     -- ========== 时间字段 ==========
     event_time BIGINT,
