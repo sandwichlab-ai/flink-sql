@@ -51,6 +51,12 @@ CREATE TABLE processed_events (
     'properties.sasl.jaas.config' = 'software.amazon.msk.auth.iam.IAMLoginModule required;',
     'properties.sasl.client.callback.handler.class' = 'software.amazon.msk.auth.iam.IAMClientCallbackHandler',
 
+    -- 连接保活，防止 MSK Serverless 断开空闲连接
+    'properties.connections.max.idle.ms' = '60000',
+    'properties.metadata.max.age.ms' = '60000',
+    'properties.reconnect.backoff.ms' = '1000',
+    'properties.reconnect.backoff.max.ms' = '10000',
+
     -- Key 和 Value 格式
     'key.format' = 'json',
     'value.format' = 'json'
