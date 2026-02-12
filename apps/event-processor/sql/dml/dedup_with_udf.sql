@@ -73,7 +73,7 @@ FROM (
         server_time,
         gtm_preview_code,
         ROW_NUMBER() OVER (
-            PARTITION BY anonymous_id, event_id
+            PARTITION BY event_id
             ORDER BY event_time ASC
         ) AS row_num
     FROM raw_events

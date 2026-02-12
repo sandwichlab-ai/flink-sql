@@ -39,7 +39,7 @@ CREATE TABLE processed_events (
     processing_status STRING,     -- success, filtered, deduplicated
 
     -- ========== 主键（用于 upsert 去重）==========
-    PRIMARY KEY (event_id, anonymous_id) NOT ENFORCED
+    PRIMARY KEY (event_id) NOT ENFORCED
 ) WITH (
     'connector' = 'upsert-kafka',
     'topic' = '${OUTPUT_TOPIC}',
