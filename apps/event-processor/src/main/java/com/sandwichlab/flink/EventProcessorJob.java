@@ -31,7 +31,7 @@ public class EventProcessorJob {
             config.getKafkaPartitions(),
             (short) 3
         );
-        topicManager.ensureTopicsExist(config.getInputTopic(), config.getOutputTopic(), config.getAttributedTopic());
+        topicManager.ensureTopicsExist(config.getInputTopic(), config.getOutputTopic(), config.getAttributedTopic(), config.getExposureTopic());
 
         // 创建 SQL 加载器
         SqlLoader sqlLoader = new SqlLoader(config.toSqlVariables());
@@ -98,6 +98,14 @@ public class EventProcessorJob {
         // DDL: 创建归因事件 Sink 表 (Iceberg)
         LOG.info("Creating sink table: attributed_events (Iceberg)");
         tableEnv.executeSql(sqlLoader.load("sql/ddl/sink/attributed_events_s3.sql"));
+
+        // DDL: 创建曝光事件源表 (Kafka)
+        LOG.info("Creating source table: exposure_events (Kafka)");
+        tableEnv.executeSql(sqlLoader.load("sql/ddl/source/exposure_events.sql"));
+
+        // DDL: 创建曝光事件 Sink 表 (Iceberg)
+        LOG.info("Creating sink table: exposure_events (Iceberg)");
+        tableEnv.executeSql(sqlLoader.load("sql/ddl/sink/exposure_events_s3.sql"));
 
         // DML: 执行去重逻辑，写入 Kafka、S3 和归因事件
         LOG.info("Executing deduplication (Kafka + S3 + Attribution sinks)");

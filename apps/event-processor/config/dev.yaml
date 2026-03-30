@@ -41,6 +41,7 @@ kafka:
   input_topic: raw-events
   output_topic: processed-events
   attributed_topic: attributed-events
+  exposure_topic: exposure-events
   partitions: 3  # Kafka 分区数，与 parallelism 一致
   max_poll_records: 100  # 每次 poll 最大记录数（间接控制消费速度）
 

@@ -247,4 +247,44 @@ FROM (
 ) AS deduped
 WHERE row_num = 1;
 
+-- Sink 4: 写入曝光事件到 Iceberg (append-only)
+INSERT INTO iceberg_catalog.${ICEBERG_DATABASE}.exposure_events_v1 (
+    event_id,
+    page_url,
+    product_id,
+    store_id,
+    scm,
+    visible,
+    visible_duration_ms,
+    visible_ratio,
+    session_id,
+    anonymous_id,
+    ext_json,
+    event_time,
+    report_time,
+    server_time,
+    processed_time,
+    dt,
+    hr
+)
+SELECT
+    event_id,
+    page_url,
+    product_id,
+    store_id,
+    scm,
+    visible,
+    visible_duration_ms,
+    visible_ratio,
+    session_id,
+    anonymous_id,
+    ext_json,
+    event_time,
+    report_time,
+    server_time,
+    CURRENT_TIMESTAMP AS processed_time,
+    DATE_FORMAT(CURRENT_TIMESTAMP + INTERVAL '8' HOUR, 'yyyy-MM-dd') AS dt,  -- 北京时间 UTC+8
+    DATE_FORMAT(CURRENT_TIMESTAMP + INTERVAL '8' HOUR, 'HH') AS hr           -- 北京时间 UTC+8
+FROM exposure_events;
+
 END;

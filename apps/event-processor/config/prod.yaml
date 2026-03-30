@@ -43,6 +43,7 @@ kafka:
   input_topic: raw-events
   output_topic: processed-events
   attributed_topic: attributed-events
+  exposure_topic: exposure-events
   partitions: 3  # Kafka 分区数，与 parallelism 一致
 
 dynamodb:

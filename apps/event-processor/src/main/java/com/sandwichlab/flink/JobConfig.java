@@ -26,6 +26,7 @@ public class JobConfig {
     private final String inputTopic;
     private final String outputTopic;
     private final String attributedTopic;
+    private final String exposureTopic;
     private final String awsRegion;
     private final String ddbTableName;
     private final int kafkaPartitions;
@@ -40,6 +41,7 @@ public class JobConfig {
         this.inputTopic = props.getOrDefault("INPUT_TOPIC", "raw-events");
         this.outputTopic = props.getOrDefault("OUTPUT_TOPIC", "processed-events");
         this.attributedTopic = props.getOrDefault("ATTRIBUTED_TOPIC", "attributed-events");
+        this.exposureTopic = props.getOrDefault("EXPOSURE_TOPIC", "exposure-events");
         this.awsRegion = props.getOrDefault("AWS_REGION", "us-west-2");
         this.ddbTableName = props.getOrDefault("DDB_TABLE_NAME", "click_events");
         this.kafkaPartitions = Integer.parseInt(props.getOrDefault("KAFKA_PARTITIONS", "3"));
@@ -71,6 +73,7 @@ public class JobConfig {
         props.put("INPUT_TOPIC", getEnvOrProperty("INPUT_TOPIC", "raw-events"));
         props.put("OUTPUT_TOPIC", getEnvOrProperty("OUTPUT_TOPIC", "processed-events"));
         props.put("ATTRIBUTED_TOPIC", getEnvOrProperty("ATTRIBUTED_TOPIC", "attributed-events"));
+        props.put("EXPOSURE_TOPIC", getEnvOrProperty("EXPOSURE_TOPIC", "exposure-events"));
         props.put("AWS_REGION", getEnvOrProperty("AWS_REGION", "us-west-2"));
         props.put("DDB_TABLE_NAME", getEnvOrProperty("DDB_TABLE_NAME", "click_events"));
         props.put("KAFKA_PARTITIONS", getEnvOrProperty("KAFKA_PARTITIONS", "3"));
@@ -110,6 +113,10 @@ public class JobConfig {
         return attributedTopic;
     }
 
+    public String getExposureTopic() {
+        return exposureTopic;
+    }
+
     public int getKafkaPartitions() {
         return kafkaPartitions;
     }
@@ -120,6 +127,7 @@ public class JobConfig {
         variables.put("INPUT_TOPIC", inputTopic);
         variables.put("OUTPUT_TOPIC", outputTopic);
         variables.put("ATTRIBUTED_TOPIC", attributedTopic);
+        variables.put("EXPOSURE_TOPIC", exposureTopic);
         variables.put("AWS_REGION", awsRegion);
         variables.put("DDB_TABLE_NAME", ddbTableName);
         variables.put("MAX_POLL_RECORDS", maxPollRecords);
